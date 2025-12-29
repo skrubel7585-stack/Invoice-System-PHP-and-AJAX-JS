@@ -1,0 +1,123 @@
+<?php
+    session_start();
+    include "db/conn.php";
+    $username = $_SESSION['username'];
+    $pass = $_SESSION['pass'];
+    $adminsql = mysqli_query($conn, "select * from user where email = '$username' and pass = '$pass'");
+    $adminfetch = mysqli_fetch_array($adminsql);
+    if($username == true & $pass == true){
+?>
+
+<?php include "inc/header.php"; ?>    
+    <!-- ?PROD Only: Google Tag Manager (noscript) (Default ThemeSelection: GTM-5DDHKGP, PixInvent: GTM-5J3LMKC) -->
+    <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-5J3LMKC" height="0" width="0" style="display: none; visibility: hidden"></iframe></noscript>
+    <!-- End Google Tag Manager (noscript) -->
+    
+    <!-- Layout wrapper -->
+    <div class="layout-wrapper layout-content-navbar">
+        <div class="layout-container">
+            <?php include "inc/side_bar.php"; ?>
+            <!-- Layout container -->
+            <div class="layout-page">
+                <?php include "inc/top_bar.php"; ?>
+                <!-- Content wrapper -->
+                <div class="content-wrapper">
+                    <!-- Content -->
+                    <div class="container-xxl flex-grow-1 container-p-y">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5 class="card-title">All Client</h5>
+                                <div class="d-flex justify-content-between align-items-center row pt-4 gap-6 gap-md-0">
+                                    <div class="col-md-4 product_status"></div>
+                                    <div class="col-md-4 product_category"></div>
+                                    <a href="client_add.php">
+                                        <div class="col-md-4 product_stock btn btn-primary">Add Client</div>
+                                    </a>
+                                </div>
+                            </div>
+                            <div class="card-datatable table-responsive">
+                                <div class="d-flex justify-content-between align-items-center row pt-4 gap-6 gap-md-0">
+                                    <form id="searchForm" method="POST">
+                                        <input type="text" id="searchID" placeholder="Enter Company Name">
+                                        <!--<input type="submit" name="submit" value="Search">-->
+                                    </form>
+                                </div>
+                                
+                                <div id="showData"></div>
+
+                                <table class="datatables-products table" id="noneSearch">
+                                    <thead class="border-top">
+                                        <tr>
+                                            <th></th>
+                                            <th>Contact Person</th>
+                                            <th>Company</th>
+                                            <th>Email</th>
+                                            <th>Number</th>
+                                            <th>GST</th>
+                                            <th>Address</th>
+                                            <th>PAN</th>
+                                            <th>Additional Note</th>
+                                            <th>Action</th>
+                                            <th></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="clientListBody">
+                                        <div id="showData"></div>
+                                        <!-- Data will be loaded here via AJAX -->
+                                    </tbody>
+                                </table>
+
+                            </div>
+                        </div>
+                    </div>
+                    <!-- / Content -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- jQuery -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script type="text/javascript">
+        $(document).ready(function () {
+            // Fetch data when page loads
+            fetchClientData();
+
+            // Search functionality on keyup
+            $("#searchID").on("keyup", function () {
+                var search_item = $(this).val();
+
+                $.ajax({
+                    url: "search_client_ajax.php",
+                    type: "POST",
+                    data: { search: search_item },
+                    success: function (data) {
+                        $("#clientListBody").html(data);
+                    }
+                });
+            });
+
+            // Fetch client data function
+            function fetchClientData() {
+                $.ajax({
+                    url: 'fetch_data_client_ajax.php',  // URL to your PHP file
+                    type: 'GET',
+                    success: function (data) {
+                        // Display the fetched data
+                        $('#clientListBody').html(data);
+                    },
+                    error: function () {
+                        console.log("Error fetching data");
+                    }
+                });
+            }
+        });
+    </script>
+
+<?php include "inc/footer.php"; ?>
+
+<?php
+    } else {
+        echo "<script>window.location.href='login/';</script>";
+    }
+?>
